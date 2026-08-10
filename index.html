@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
@@ -77,9 +77,89 @@
             background-color: #10b981;
             border-color: #10b981;
         }
+        
+        /* ===== FALLING ANIMATION ===== */
+        @keyframes fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes sway {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(30px);
+            }
+            50% {
+                transform: translateX(-30px);
+            }
+            75% {
+                transform: translateX(20px);
+            }
+        }
+        
+        .falling-particle {
+            position: fixed;
+            top: -50px;
+            pointer-events: none;
+            z-index: 1;
+            font-size: 24px;
+            filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.8));
+            animation: fall linear infinite, sway ease-in-out infinite;
+        }
+        
+        .particle-1 {
+            animation-duration: 8s, 3s;
+            opacity: 0.8;
+        }
+        
+        .particle-2 {
+            animation-duration: 10s, 3.5s;
+            opacity: 0.6;
+        }
+        
+        .particle-3 {
+            animation-duration: 12s, 4s;
+            opacity: 0.7;
+        }
+        
+        .particle-4 {
+            animation-duration: 9s, 3.2s;
+            opacity: 0.65;
+        }
+        
+        .particle-5 {
+            animation-duration: 11s, 3.8s;
+            opacity: 0.75;
+        }
+        
+        .particle-6 {
+            animation-duration: 13s, 4.2s;
+            opacity: 0.6;
+        }
+        
+        .particle-7 {
+            animation-duration: 8.5s, 3.6s;
+            opacity: 0.7;
+        }
+        
+        .particle-8 {
+            animation-duration: 10.5s, 3.3s;
+            opacity: 0.68;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-brand-gold selection:text-brand-dark">
+
+    <!-- Falling Particles Container -->
+    <div id="particlesContainer"></div>
 
     <!-- Top Announcement Bar -->
     <div class="bg-brand-dark text-amber-200 text-xs sm:text-sm py-2 px-4 text-center border-b border-amber-900/40 flex justify-between items-center max-w-7xl mx-auto w-full">
@@ -727,7 +807,52 @@
             renderProducts();
             updateWhatsappLinks();
             renderCategoryTabs();
+            initFallingParticles();
         });
+
+        // ===== REAL-TIME DATA SYNC SYSTEM =====
+        // مراقبة أي تغييرات في localStorage وتحديث الصفحة فوراً
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'kammouna_products' || event.key === 'kammouna_categories' || event.key === 'kammouna_settings' || event.key === 'kammouna_whatsapp') {
+                // إعادة تحميل البيانات من localStorage
+                loadInitialData();
+                renderProducts();
+                renderCategoryTabs();
+                updateWhatsappLinks();
+            }
+        });
+
+        // ===== FALLING PARTICLES ANIMATION =====
+        function initFallingParticles() {
+            const particles = ['🌾', '🌶️', '🥜', '☕', '✨', '🌿', '⭐', '🎁'];
+            const container = document.getElementById('particlesContainer');
+
+            function createParticle() {
+                const particle = document.createElement('div');
+                const randomParticle = particles[Math.floor(Math.random() * particles.length)];
+                const randomLeft = Math.random() * 100;
+                const randomClass = Math.floor(Math.random() * 8) + 1;
+
+                particle.className = `falling-particle particle-${randomClass}`;
+                particle.textContent = randomParticle;
+                particle.style.left = randomLeft + '%';
+
+                container.appendChild(particle);
+
+                // Remove particle after animation ends
+                setTimeout(() => {
+                    particle.remove();
+                }, 13000);
+            }
+
+            // Create particles at intervals
+            setInterval(createParticle, 800);
+
+            // Create initial particles
+            for (let i = 0; i < 5; i++) {
+                setTimeout(createParticle, i * 400);
+            }
+        }
 
         function loadInitialData() {
             const storedProducts = localStorage.getItem('kammouna_products');
@@ -908,7 +1033,7 @@
             localStorage.setItem('kammouna_whatsapp', whatsappNumber);
             updateWhatsappLinks();
             renderProducts();
-            showToast('تم تحديث رقم الواتساب!');
+            showToast('✅ تم تحديث رقم الواتساب! جميع أزرار الطلب محدثة الآن.');
         }
 
         function saveGeneralSettings(field) {
@@ -930,7 +1055,8 @@
             saveSettings();
             applySettings();
             renderProducts();
-            showToast('تم حفظ التغييرات!');
+            renderCategoryTabs();
+            showToast('✅ تم حفظ التغييرات! ستظهر فوراً للعملاء.');
         }
 
         function handleLogoUpload() {
